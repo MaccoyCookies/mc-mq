@@ -1,9 +1,7 @@
-package io.github.maccoycookies.mcmq.core;
+package io.github.maccoycookies.mcmq.client;
 
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;

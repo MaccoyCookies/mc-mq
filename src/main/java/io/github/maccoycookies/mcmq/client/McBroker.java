@@ -1,6 +1,5 @@
-package io.github.maccoycookies.mcmq.core;
+package io.github.maccoycookies.mcmq.client;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

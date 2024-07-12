@@ -1,4 +1,4 @@
-package io.github.maccoycookies.mcmq.core;
+package io.github.maccoycookies.mcmq.client;
 
 public interface McListener<T> {
 

@@ -1,10 +1,9 @@
 package io.github.maccoycookies.mcmq.demo;
 
-import io.github.maccoycookies.mcmq.core.McBroker;
-import io.github.maccoycookies.mcmq.core.McConsumer;
-import io.github.maccoycookies.mcmq.core.McMessage;
-import io.github.maccoycookies.mcmq.core.McProducer;
-import org.springframework.core.annotation.Order;
+import io.github.maccoycookies.mcmq.client.McBroker;
+import io.github.maccoycookies.mcmq.client.McConsumer;
+import io.github.maccoycookies.mcmq.client.McMessage;
+import io.github.maccoycookies.mcmq.client.McProducer;
 
 public class McMqDemo {
 

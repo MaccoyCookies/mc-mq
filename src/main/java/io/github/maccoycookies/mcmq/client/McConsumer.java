@@ -1,9 +1,13 @@
-package io.github.maccoycookies.mcmq.core;
+package io.github.maccoycookies.mcmq.client;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * message consumer
  */
 public class McConsumer<T> {
+
+    private String id;
 
     McBroker broker;
 
@@ -11,8 +15,11 @@ public class McConsumer<T> {
 
     McMq mcMq;
 
+    static AtomicInteger idgen = new AtomicInteger(0);
+
     public McConsumer(McBroker broker) {
         this.broker = broker;
+        this.id = "CID" + idgen.getAndIncrement();
     }
 
     public void subscribe(String topic) {
