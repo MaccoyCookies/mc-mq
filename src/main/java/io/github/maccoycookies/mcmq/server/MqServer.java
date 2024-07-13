@@ -5,26 +5,34 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author Maccoy
  * @date 2024/7/12 22:33
  * Description Mq Server
  */
-@Controller
+@RestController
 @RequestMapping("/mcmq")
 public class MqServer {
 
     // send
     @RequestMapping("/send")
-    public Result<String> send(@RequestParam("topic") String topic, @RequestParam("consumerId") String consumerId,
-                       @RequestBody McMessage<String> message) {
-        return Result.ok("" + MessageQueue.send(topic, consumerId, message));
+    public Result<String> send(@RequestParam("topic") String topic, @RequestBody McMessage<String> message) {
+        return Result.ok("" + MessageQueue.send(topic, message));
     }
     // receive
     @RequestMapping("receive")
     public Result<McMessage<?>> receive(@RequestParam("topic") String topic, @RequestParam("consumerId") String consumerId) {
         return Result.msg(MessageQueue.receive(topic, consumerId));
+    }
+
+    @RequestMapping("batch")
+    public Result<List<McMessage<?>>> batch(@RequestParam("topic") String topic, @RequestParam("consumerId") String consumerId,
+                                            @RequestParam(value = "size", required = false, defaultValue = "1000") Integer size) {
+        return Result.msg(MessageQueue.batch(topic, consumerId, size));
     }
 
     // ack

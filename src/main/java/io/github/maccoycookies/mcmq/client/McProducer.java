@@ -11,9 +11,7 @@ public class McProducer {
     McBroker broker;
 
     public boolean send(String topic, McMessage message) {
-        McMq mcMq = broker.find(topic);
-        if (mcMq == null) throw new RuntimeException("topic not found");
-        return mcMq.send(message);
+        return broker.send(topic, message);
     }
 
 }

@@ -4,6 +4,8 @@ import io.github.maccoycookies.mcmq.client.McMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author Maccoy
  * @date 2024/7/12 22:47
@@ -35,5 +37,9 @@ public class Result<T> {
 
     public static Result<McMessage<?>> msg(McMessage<?> message) {
         return new Result<>(1, message);
+    }
+
+    public static Result<List<McMessage<?>>> msg(List<McMessage<?>> messages) {
+        return new Result<>(1, messages);
     }
 }

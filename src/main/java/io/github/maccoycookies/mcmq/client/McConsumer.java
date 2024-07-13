@@ -1,5 +1,10 @@
 package io.github.maccoycookies.mcmq.client;
 
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -11,10 +16,6 @@ public class McConsumer<T> {
 
     McBroker broker;
 
-    String topic;
-
-    McMq mcMq;
-
     static AtomicInteger idgen = new AtomicInteger(0);
 
     public McConsumer(McBroker broker) {
@@ -22,17 +23,33 @@ public class McConsumer<T> {
         this.id = "CID" + idgen.getAndIncrement();
     }
 
+    public McMessage<T> receive(String topic) {
+        return broker.receive(topic, id);
+    }
+
     public void subscribe(String topic) {
-        this.topic = topic;
-        this.mcMq = broker.find(topic);
-
+        broker.subscribe(topic, id);
     }
 
-    public McMessage<T> poll(long timeout) {
-        return mcMq.poll(timeout);
+    public void unsubscribe(String topic) {
+        broker.unsubscribe(topic, id);
     }
 
-    public void listen(McListener<T> listener) {
-        mcMq.addListener(listener);
+    public boolean ack(String topic, Integer offset) {
+        return broker.ack(topic, id, offset);
     }
+
+    public boolean ack(String topic, McMessage<?> message) {
+        int offset = Integer.parseInt(message.getHeaders().get("X-offset"));
+        return ack(topic, offset);
+    }
+
+    public void listen(String topic, McListener<T> listener) {
+        this.listener = listener;
+        broker.addListener(topic, this);
+    }
+
+    @Getter
+    private McListener listener;
+
 }

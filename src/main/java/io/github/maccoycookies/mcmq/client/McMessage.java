@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,7 +27,7 @@ public class McMessage<T> {
     /**
      * 系统属性
      */
-    private Map<String, String> headers;
+    private Map<String, String> headers = new HashMap<>();
 
     /**
      * 业务属性
