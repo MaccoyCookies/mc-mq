@@ -46,14 +46,14 @@ public class MqServer {
     // subscribe
     @RequestMapping("/subscribe")
     public Result<String> subscribe(@RequestParam("topic") String topic, @RequestParam("consumerId") String consumerId) {
-        MessageQueue.sub(new MessageSubscription(topic, consumerId, -1));
+        MessageQueue.sub(new MessageSubscription(topic, consumerId, 0));
         return Result.ok();
     }
 
     // unsubscribe
     @RequestMapping("/unsubscribe")
     public Result<String> unsubscribe(@RequestParam("topic") String topic, @RequestParam("consumerId") String consumerId) {
-        MessageQueue.unsub(new MessageSubscription(topic, consumerId, -1));
+        MessageQueue.unsub(new MessageSubscription(topic, consumerId, 0));
         return Result.ok();
     }
 

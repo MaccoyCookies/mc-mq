@@ -16,7 +16,7 @@ public class MessageSubscription {
 
     private String consumerId;
 
-    private int offset = -1;
+    private int offset = 0;
 
 
 

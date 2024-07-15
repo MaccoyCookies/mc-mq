@@ -5,6 +5,7 @@ import io.github.maccoycookies.mcmq.client.McBroker;
 import io.github.maccoycookies.mcmq.client.McConsumer;
 import io.github.maccoycookies.mcmq.client.McMessage;
 import io.github.maccoycookies.mcmq.client.McProducer;
+import io.github.maccoycookies.mcmq.store.Indexer;
 
 public class McMqDemo {
 
@@ -14,19 +15,19 @@ public class McMqDemo {
         McBroker broker = McBroker.getDefault();
         McProducer producer = broker.createProducer();
         McConsumer<?> consumer = broker.createConsumer(topic);
-        consumer.listen(topic, message -> {
-            System.out.println("onMessage => " + message);
-        });
+        // consumer.listen(topic, message -> {
+        //     System.out.println("onMessage => " + message);
+        // });
         for (int i = 0; i < 10; i++) {
             McOrder order = new McOrder(ids, "Mc-Item-" + ids, 100.0 * ids);
             producer.send(topic, new McMessage<>(ids++, JSON.toJSONString(order), null));
         }
 
-        // for (int i = 0; i < 10; i++) {
-        //     McMessage<String> message = (McMessage<String>) consumer.receive(topic);
-        //     System.out.println(message);
-        //     consumer.ack(topic, message);
-        // }
+        for (int i = 0; i < 10; i++) {
+            McMessage<String> message = (McMessage<String>) consumer.receive(topic);
+            System.out.println(message);
+            consumer.ack(topic, message);
+        }
 
         while (true) {
             char c = (char) System.in.read();

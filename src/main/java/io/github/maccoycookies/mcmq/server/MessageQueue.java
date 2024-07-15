@@ -1,6 +1,8 @@
 package io.github.maccoycookies.mcmq.server;
 
 import io.github.maccoycookies.mcmq.client.McMessage;
+import io.github.maccoycookies.mcmq.store.Indexer;
+import io.github.maccoycookies.mcmq.store.Store;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,28 +26,26 @@ public class MessageQueue {
 
     private Map<String, MessageSubscription> subscriptionMap = new HashMap<>();
     private String topic;
-    private McMessage<?>[] queue = new McMessage[1024 * 10];
-    private int index = 0;
+    private Store store = null;
 
     public MessageQueue(String topic) {
         this.topic = topic;
+        this.store = new Store(topic);
     }
 
 
-    public int send(McMessage<?> message) {
-        if (index >= queue.length) {
-            return -1;
-        }
-        message.getHeaders().put("X-offset", String.valueOf(index));
-        queue[index++] = message;
-        return index;
+    public int send(McMessage<String> message) {
+        // if (index >= queue.length) {
+        //     return -1;
+        // }
+        int offset = store.pos();
+        message.getHeaders().put("X-offset", String.valueOf(offset));
+        store.write(message);
+        return offset;
     }
 
-    public McMessage<?> recv(int ind) {
-        if (ind <= index) {
-            return queue[ind];
-        }
-        return null;
+    public McMessage<?> recv(int offset) {
+        return store.read(offset);
     }
 
     private void subscribe(MessageSubscription subscription) {
@@ -97,8 +97,9 @@ public class MessageQueue {
             throw new RuntimeException("subscription not found for topic/consumerId = " + topic + "/" + consumerId);
         }
         MessageSubscription messageSubscription = messageQueue.subscriptionMap.get(consumerId);
-        McMessage<?> msg = messageQueue.recv(messageSubscription.getOffset() + 1);
-        System.out.println("===> receive: topic/cid = " + topic + "/" + consumerId);
+        // Indexer.Entry entry = Indexer.getEntry(topic, messageSubscription.getOffset());
+        McMessage<?> msg = messageQueue.recv(messageSubscription.getOffset());
+        System.out.println("===> receive: topic/cid/offset1/offset2 = " + topic + "/" + consumerId + "/" + messageSubscription.getOffset());
         System.out.println("===> receive: msg = " + msg);
         return msg;
     }
@@ -111,12 +112,14 @@ public class MessageQueue {
         }
         MessageSubscription messageSubscription = messageQueue.subscriptionMap.get(consumerId);
         List<McMessage<?>> msgs = new ArrayList<>();
-        int cur = 1;
+        int cur = 0;
         do {
-            McMessage<?> msg = messageQueue.recv(messageSubscription.getOffset() + cur++);
+            McMessage<?> msg = messageQueue.recv(messageSubscription.getOffset());
+            Indexer.Entry entry = Indexer.getEntry(topic, messageSubscription.getOffset());
+            cur += entry.getLength();
             if (msg == null) break;
             msgs.add(msg);
-        } while (cur <= size);
+        } while (msgs.size() < size);
         System.out.println("===> batch: topic/cid/size = " + topic + "/" + consumerId + "/" + msgs.size());
         System.out.println("===> batch: msg = " + msgs);
         return msgs;
@@ -129,11 +132,12 @@ public class MessageQueue {
             throw new RuntimeException("subscription not found for topic/consumerId = " + topic + "/" + consumerId);
         }
         MessageSubscription messageSubscription = messageQueue.subscriptionMap.get(consumerId);
-        if (offset <= messageSubscription.getOffset() || offset > messageQueue.index) {
+        if (offset < messageSubscription.getOffset() || offset > Store.LEN) {
             return -1;
         }
+        Indexer.Entry entry = Indexer.getEntry(topic, offset);
         System.out.println("===> ack: topic/cid/offset = " + topic + "/" + consumerId + "/" + offset);
-        messageSubscription.setOffset(offset);
+        messageSubscription.setOffset(offset + entry.getLength());
         return offset;
     }
 }

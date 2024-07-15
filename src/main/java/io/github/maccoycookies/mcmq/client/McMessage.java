@@ -34,12 +34,12 @@ public class McMessage<T> {
      */
     // private Map<String, String> properties;
 
-    public static long getId() {
+    public static long nextId() {
         return idgen.getAndIncrement();
     }
 
-    public static McMessage<?> create(String body, Map<String, String> header) {
-        return new McMessage<>(getId(), body, header);
+    public static McMessage<String> create(String body, Map<String, String> header) {
+        return new McMessage<>(nextId(), body, header);
     }
 
 }
